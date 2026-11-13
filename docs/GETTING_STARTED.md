@@ -7,8 +7,8 @@ Java 21, Git, Docker Engine/Desktop with Compose v2, Python 3.10+ for the gate. 
 ## 2. Clone and read
 
 ```bash
-git clone https://github.com/Abd-Elrahman3/01-shelfflow-spring-boot.git
-cd 01-shelfflow-spring-boot
+git clone https://github.com/Abd-Elrahman3/shelfflow-spring-boot.git
+cd shelfflow-spring-boot
 git switch -c feature/m1-domain
 ```
 
