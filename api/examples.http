@@ -1,0 +1,25 @@
+@base = http://localhost:8080
+@token = REPLACE_WITH_LOCAL_TEST_TOKEN
+
+# Target examples; routes are learner work and UUIDs must be replaced.
+
+### Register a member (save the id from the response)
+POST {{base}}/api/v1/members
+Content-Type: application/json
+
+{"email":"ada@example.com","displayName":"Ada"}
+
+### Create a book
+POST {{base}}/api/v1/books
+Content-Type: application/json
+
+{"isbn":"9780134685991","title":"Effective Java","authors":["Joshua Bloch"]}
+
+### List with a bounded page
+GET {{base}}/api/v1/books?page=0&size=20
+
+### Borrow (replace the UUIDs with your created member and copy)
+POST {{base}}/api/v1/loans
+Content-Type: application/json
+
+{"memberId":"00000000-0000-0000-0000-000000000001","copyId":"00000000-0000-0000-0000-000000000002"}

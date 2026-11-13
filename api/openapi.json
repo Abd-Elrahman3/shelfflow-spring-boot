@@ -1,0 +1,929 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "ShelfFlow Target API",
+    "version": "1.0.0",
+    "description": "Target contract; implementation is intentionally unfinished. Markdown rules define details and additional failure cases."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080"
+    }
+  ],
+  "paths": {
+    "/api/v1/members": {
+      "post": {
+        "operationId": "post_api_v1_members",
+        "summary": "201 Member; 400 invalid; 409 duplicate",
+        "description": "{email,displayName}; see docs/API_REQUIREMENTS.md for rule-level behavior.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "201 Member; 400 invalid; 409 duplicate",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberView"
+                }
+              }
+            },
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "URI of created resource"
+              }
+            }
+          },
+          "400": {
+            "description": "201 Member; 400 invalid; 409 duplicate",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "201 Member; 400 invalid; 409 duplicate",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "displayName": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "email",
+                  "displayName"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/books": {
+      "post": {
+        "operationId": "post_api_v1_books",
+        "summary": "201 Book; 409 duplicate ISBN",
+        "description": "{isbn,title,authors:[string]}; see docs/API_REQUIREMENTS.md for rule-level behavior.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "201 Book; 409 duplicate ISBN",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BookView"
+                }
+              }
+            },
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "URI of created resource"
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or authorization failure",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "201 Book; 409 duplicate ISBN",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "isbn": {
+                    "type": "string",
+                    "pattern": "^[0-9]{13}$"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "authors": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minItems": 1
+                  }
+                },
+                "required": [
+                  "isbn",
+                  "title",
+                  "authors"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "get_api_v1_books",
+        "summary": "200 Page<Book>",
+        "description": "page,size,title query parameters; see docs/API_REQUIREMENTS.md for rule-level behavior.",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          },
+          {
+            "name": "title",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 Page<Book>",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BookPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or authorization failure",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/books/{bookId}/copies": {
+      "post": {
+        "operationId": "post_api_v1_books_bookId_copies",
+        "summary": "201 BookCopy; 404 book",
+        "description": "{}; see docs/API_REQUIREMENTS.md for rule-level behavior.",
+        "parameters": [
+          {
+            "name": "bookId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "201 BookCopy; 404 book",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CopyView"
+                }
+              }
+            },
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "URI of created resource"
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or authorization failure",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "201 BookCopy; 404 book",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/loans": {
+      "post": {
+        "operationId": "post_api_v1_loans",
+        "summary": "201 Loan; 404 missing; 409 unavailable/limit",
+        "description": "{memberId,copyId}; see docs/API_REQUIREMENTS.md for rule-level behavior.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "201 Loan; 404 missing; 409 unavailable/limit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoanView"
+                }
+              }
+            },
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "URI of created resource"
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or authorization failure",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "201 Loan; 404 missing; 409 unavailable/limit",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "201 Loan; 404 missing; 409 unavailable/limit",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "memberId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "copyId": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                },
+                "required": [
+                  "memberId",
+                  "copyId"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/loans/{loanId}": {
+      "get": {
+        "operationId": "get_api_v1_loans_loanId",
+        "summary": "200 Loan; 404 missing",
+        "description": "\u2014; see docs/API_REQUIREMENTS.md for rule-level behavior.",
+        "parameters": [
+          {
+            "name": "loanId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 Loan; 404 missing",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoanView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or authorization failure",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "200 Loan; 404 missing",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/loans/{loanId}/return": {
+      "post": {
+        "operationId": "post_api_v1_loans_loanId_return",
+        "summary": "200 Loan, including replay; 404 missing",
+        "description": "{}; see docs/API_REQUIREMENTS.md for rule-level behavior.",
+        "parameters": [
+          {
+            "name": "loanId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 Loan, including replay; 404 missing",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoanView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or authorization failure",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "200 Loan, including replay; 404 missing",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/reports/overdue": {
+      "get": {
+        "operationId": "get_api_v1_reports_overdue",
+        "summary": "200 Page<{loanId,dueOn,daysOverdue,fine}>",
+        "description": "page,size; see docs/API_REQUIREMENTS.md for rule-level behavior.",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 Page<{loanId,dueOn,daysOverdue,fine}>",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OverduePage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or authorization failure",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Member": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "email": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "joinedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "displayName",
+          "joinedAt"
+        ]
+      },
+      "Book": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "isbn": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "authors": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "isbn",
+          "title",
+          "authors"
+        ]
+      },
+      "BookCopy": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "bookId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "required": [
+          "id",
+          "bookId",
+          "status",
+          "version"
+        ]
+      },
+      "Loan": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "copyId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "memberId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "borrowedOn": {
+            "type": "string",
+            "format": "date"
+          },
+          "dueOn": {
+            "type": "string",
+            "format": "date"
+          },
+          "returnedOn": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "copyId",
+          "memberId",
+          "borrowedOn",
+          "dueOn",
+          "returnedOn"
+        ]
+      },
+      "Problem": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "instance": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "traceId": {
+            "type": "string"
+          },
+          "fieldErrors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "field",
+                "message"
+              ],
+              "properties": {
+                "field": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "type",
+          "title",
+          "status",
+          "detail",
+          "instance",
+          "code"
+        ]
+      },
+      "MemberView": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "email": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "joinedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "displayName",
+          "joinedAt"
+        ],
+        "additionalProperties": false
+      },
+      "BookView": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "isbn": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "authors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "isbn",
+          "title",
+          "authors"
+        ],
+        "additionalProperties": false
+      },
+      "CopyView": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "bookId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "required": [
+          "id",
+          "bookId",
+          "status",
+          "version"
+        ],
+        "additionalProperties": false
+      },
+      "LoanView": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "copyId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "memberId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "borrowedOn": {
+            "type": "string",
+            "format": "date"
+          },
+          "dueOn": {
+            "type": "string",
+            "format": "date"
+          },
+          "returnedOn": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "copyId",
+          "memberId",
+          "borrowedOn",
+          "dueOn",
+          "returnedOn"
+        ],
+        "additionalProperties": false
+      },
+      "OverdueView": {
+        "type": "object",
+        "properties": {
+          "loanId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "dueOn": {
+            "type": "string",
+            "format": "date"
+          },
+          "daysOverdue": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "fine": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "loanId",
+          "dueOn",
+          "daysOverdue",
+          "fine"
+        ],
+        "additionalProperties": false
+      },
+      "BookPage": {
+        "type": "object",
+        "required": [
+          "items",
+          "page",
+          "size",
+          "totalElements"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BookView"
+            }
+          },
+          "page": {
+            "type": "integer"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "OverduePage": {
+        "type": "object",
+        "required": [
+          "items",
+          "page",
+          "size",
+          "totalElements"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OverdueView"
+            }
+          },
+          "page": {
+            "type": "integer"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      }
+    }
+  }
+}
